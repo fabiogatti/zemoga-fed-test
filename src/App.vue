@@ -90,9 +90,19 @@
         <main role="main">
             <!-- Start: Implementation -->
             👉 Your code goes here 👈
-            <div v-for="card in cards" :key="card.name">
-              <card :card='card'></card>
+            <div class="main-header">
+              <h1>Previous Rulings</h1>
+              <select id="gridType">
+                <option value="0">List</option>
+                <option value="1">Grid</option>
+              </select>
             </div>
+            <div class="cards-list">
+              <div v-for="card in cards" :key="card.name">
+                <card :card='card' :isGrid='isGrid'></card>
+              </div>
+            </div>
+            
             
             <!-- End: Implementation -->
         </main>
@@ -155,6 +165,11 @@ import { CardClass } from '@/classes/CardClass'
 export default {
   components: { Card },
   name: 'App',
+   data() {
+    return {
+      isGrid: false
+    }
+  },
   computed:{
     cards(){
       var cardList = new Array;
@@ -634,6 +649,37 @@ main h2 {
 .max-centered {
     display: contents;
 }
+
+/* New implementation of code */
+.main-header{
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0px;
+}
+
+.main-header h1{
+  flex-grow: 100;
+  font-weight: normal;
+}
+
+#gridType{
+  width: 150px;
+  height: 40px;
+  align-self: center;
+  text-align: center;
+  outline: 1.75px solid var(--color-dark-gray);
+}
+
+.cards-list{
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+/* End of new implementation */
+
 
 @media all and (min-width: 500px) {
     .banner-top .banner__left {
