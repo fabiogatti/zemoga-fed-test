@@ -90,6 +90,10 @@
         <main role="main">
             <!-- Start: Implementation -->
             👉 Your code goes here 👈
+            <div v-for="card in cards" :key="card.name">
+              <card :card='card'></card>
+            </div>
+            
             <!-- End: Implementation -->
         </main>
         <aside class="banner banner-bottom" role="doc-tip" aria-label="Submit a name">
@@ -144,13 +148,25 @@
 </template>
 
 <script>
-//import HelloWorld from './components/HelloWorld.vue'
+import Card from './components/Card.vue'
+import data from '@/assets/data.json'
+import { CardClass } from '@/classes/CardClass'
 
 export default {
+  components: { Card },
   name: 'App',
-  /*components: {
-    HelloWorld
-  }*/
+  computed:{
+    cards(){
+      var cardList = new Array;
+      data.data.forEach(card => {
+        cardList.push(new CardClass(card));
+      });
+      return cardList;
+    }
+  },
+  methods:{
+
+  }
 }
 </script>
 
