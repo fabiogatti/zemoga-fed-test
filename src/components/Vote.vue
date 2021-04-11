@@ -42,6 +42,9 @@ export default {
 .like:hover{
   opacity: 1;
 }
+.like[disabled]{
+  opacity: 1;
+}
 .like:hover[disabled]{
   opacity: 0.75;
 }
@@ -52,11 +55,14 @@ export default {
 .dislike:hover{
   opacity: 1;
 }
+.dislike[disabled]{
+  opacity: 1;
+}
 .dislike:hover[disabled]{
   opacity: 0.75;
 }
 .active{
-  border: 2px solid black;
+  border: 2px solid var(--color-white);
   opacity: 1;
 }
 .inactive{

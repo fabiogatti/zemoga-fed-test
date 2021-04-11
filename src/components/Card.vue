@@ -1,8 +1,14 @@
 <template>
   <div class="card-component-list">
+    <div class="background flex-row">
+      <div class="photo-div">
+        <img :src="getImgUrl" :alt="card.name">
+      </div>
+    </div>
     <vote class="current-status" :isLike='card.likes >= card.dislikes ? true : false' disabled></vote>
     <div class="time-ago">
-      <p>{{ yearAgoText + card.category }}</p>
+      <p v-show="!voted">{{ yearAgoText + card.category }}</p>
+      <p v-show="voted">Thank you for your vote!</p>
     </div>
     <div class="card-content">
       <div class="top-name">
@@ -10,7 +16,7 @@
       </div>
       <div class="middle-desc flex-row">
         <div class="description">
-          <p>{{ card.description }}</p>
+          <p>{{ trimmedDesc }}</p>
         </div>
         <div class="buttons-div flex-row">
           <vote class="btn" :isLike='true' :isButton="true" :isActive="clickedUpvote" @clicked='clickedVote' v-show="!voted"></vote>
@@ -104,6 +110,15 @@ export default {
       }
       else
         return 'Vote Now'
+    },
+    trimmedDesc(){
+      if(this.card.description.length < 150)
+        return this.card.description
+      return this.card.description.substring(0,149) + '...'
+    },
+    getImgUrl() {
+      var images = require.context('../assets/img', false, /\.jpg$/);
+      return images('./' + this.card.name + ".jpg");
     }
   },
   methods:{
@@ -159,11 +174,33 @@ export default {
 <style scoped>
 h1{
   margin: 0;
+  margin-top: 10px;
+  font-weight: 500;
+}
+*{
+  z-index: 1;
+  color: var(--color-white);
 }
 .card-component-list{
   position: relative;
-  min-height: 200px;
   margin-bottom: 25px;
+}
+.background{
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(to right, transparent 0%, var(--color-gradient-light-gray) 10% , var(--color-gradient-dark-gray) 55%, var(--color-gradient-light-gray));
+}
+.photo-div{
+  width:20%;
+  height: 100%;
+}
+.photo-div img{
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  mask-image: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
 }
 .current-status{
   position: absolute;
@@ -174,6 +211,7 @@ h1{
   position: absolute;
   top: 0;
   right: 0;
+  padding-right: 15px;
 }
 .up{
   background-color: rgba(var(--color-green-positive), .8);
@@ -191,8 +229,14 @@ h1{
 .middle-desc{
   margin-left:20%;
 }
+.description{
+  word-break: break-all;
+}
 .buttons-div{
   align-items: center;
+  min-width: 250px;
+  justify-content: flex-end;
+  margin-right: 10px;
 }
 .btn{
   margin: 0 5px;

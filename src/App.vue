@@ -199,6 +199,8 @@ export default {
     --color-light-background: rgba(255, 255, 255, .4);
     --color-lighter-background: rgba(255, 255, 255, .8);
     --color-white: rgba(255, 255, 255, 1);
+    --color-gradient-light-gray: #888888;
+    --color-gradient-dark-gray: #666666;
 }
 
 html, body {
