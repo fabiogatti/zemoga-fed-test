@@ -165,7 +165,7 @@ import { CardClass } from '@/classes/CardClass'
 export default {
   components: { Card },
   name: 'App',
-   data() {
+  data() {
     return {
       isGrid: false
     }
@@ -194,7 +194,7 @@ export default {
     --color-dark-background: rgba(0, 0, 0, .4);
     --color-darker-background: rgba(0, 0, 0, .6);
     --color-darker-gray: rgba(51, 51, 51, 1);
-    --color-dark-gray: rgba(70, 70, 70, 1);
+    --color-dark-gray: rgba(70, 70, 70, 0.65);
     --color-light-gray: rgba(235, 235, 235, 1);
     --color-light-background: rgba(255, 255, 255, .4);
     --color-lighter-background: rgba(255, 255, 255, .8);
@@ -674,9 +674,6 @@ main h2 {
   display: flex;
   flex-direction: column;
 }
-
-
-
 
 /* End of new implementation */
 

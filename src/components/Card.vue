@@ -1,9 +1,6 @@
 <template>
   <div class="card-component-list">
-    <div class="current-status" :class="[ card.likes <= card.dislikes ? 'down' : 'up']">
-      <img src="@/assets/img/thumbs-down.svg" alt="thumbs down" v-if="this.card.likes <= this.card.dislikes"/>
-      <img src="@/assets/img/thumbs-up.svg" alt="thumbs down" v-if="this.card.likes > this.card.dislikes"/>
-    </div>
+    <vote class="current-status" :isLike='card.likes >= card.dislikes ? true : false' disabled></vote>
     <div class="time-ago">
       <p>{{ yearAgoText + card.category }}</p>
     </div>
@@ -11,21 +8,26 @@
       <div class="top-name">
         <h1>{{ card.name }}</h1>
       </div>
-      <div class="middle-desc">
+      <div class="middle-desc flex-row">
         <div class="description">
           <p>{{ card.description }}</p>
         </div>
+        <div class="buttons-div flex-row">
+          <vote class="btn" :isLike='true' :isButton="true" :isActive="clickedUpvote" @clicked='clickedVote' v-show="!voted"></vote>
+          <vote class="btn" :isLike='false' :isButton="true" :isActive="clickedDownvote" @clicked='clickedVote' v-show="!voted"></vote>
+          <button class="btn btn-vote" @click="submitVote()" :class="[ clickedUpvote || clickedDownvote ? 'btn-active' : 'btn-inactive']">{{ voteBtnText }}</button>
+        </div>
       </div>
       <div class="bottom-votes flex-row">
-        <div class="up" :style="{ width : likesPercentage+'%' }">
+        <div class="up" :style="{ width : likesPercentage+'%' }"  :key="voted+totalPositiveVotes+'1'">
           <div class="flex-row">
             <img src="@/assets/img/thumbs-up.svg" alt="thumbs up"/>
-            <h1>{{ likesPercentage }}%</h1>
+            <h1 :key="voted+totalPositiveVotes">{{ likesPercentage }}%</h1>
           </div>
         </div>
-        <div class="down justify-flex-end" :style="{ width : dislikesPercentage+'%' }">
+        <div class="down justify-flex-end" :style="{ width : dislikesPercentage+'%' }" :key="voted+totalNegativeVotes+'1'">
           <div class="flex-row">
-            <h1>{{ dislikesPercentage }}%</h1>
+            <h1 :key="voted+totalNegativeVotes">{{ dislikesPercentage }}%</h1>
             <img src="@/assets/img/thumbs-down.svg" alt="thumbs down"/>
           </div>
         </div>
@@ -36,12 +38,23 @@
 
 <script>
 import { CardClass } from '@/classes/CardClass';
+import Vote from './Vote.vue';
 
 export default {
   name: 'Card',
+  components: { Vote },
   props: {
     card: CardClass,
     isGrid: Boolean
+  },
+  data() {
+    return {
+      clickedUpvote: false,
+      clickedDownvote: false,
+      voted: false,
+      storageNegatives: Number,
+      storagePositives: Number
+    }
   },
   computed: {
     yearAgoText(){
@@ -70,39 +83,92 @@ export default {
         return diffDays.toString() + ' days ago in ';
       }
     },
+    totalPositiveVotes(){
+      return this.card.likes + this.storagePositives;
+    },
+    totalNegativeVotes(){
+      return this.card.dislikes + this.storageNegatives;
+    },
     totalVotes(){
-      return this.card.likes + this.card.dislikes;
+      return this.totalPositiveVotes + this.totalNegativeVotes;
     },
     likesPercentage(){
-      return Math.ceil(this.card.likes/this.totalVotes*100);
+      return Math.ceil(this.totalPositiveVotes/this.totalVotes*100);
     },
     dislikesPercentage(){
-      return Math.floor(this.card.dislikes/this.totalVotes*100);
+      return Math.floor(this.totalNegativeVotes/this.totalVotes*100);
+    },
+    voteBtnText(){
+      if(this.voted){
+        return 'Vote Again';
+      }
+      else
+        return 'Vote Now'
     }
   },
   methods:{
-
+    storageString(isLike){
+      if(isLike)
+        return this.card.name+'likes';
+      else
+        return this.card.name+'dislikes'
+    },
+    storageVote(isLike){
+      var storedLikes = localStorage.getItem(this.storageString(isLike));
+      return storedLikes ? parseInt(storedLikes) : 0;
+    },
+    clickedVote(isLike){
+      if(isLike){
+        this.clickedUpvote = !this.clickedUpvote;
+        this.clickedDownvote = false;
+      }
+      else{
+        this.clickedDownvote = !this.clickedDownvote;
+        this.clickedUpvote = false;
+      }
+    },
+    submitVote(){
+      if(!this.voted){
+        if(this.clickedUpvote){
+          localStorage.setItem(this.storageString(true),this.storageVote(true) + 1);
+          this.storagePositives += 1;
+        }
+        else if(this.clickedDownvote){
+          localStorage.setItem(this.storageString(false),this.storageVote(false) + 1);
+          this.storageNegatives +=1;
+        }
+        else
+          return;
+        this.voted = true;
+      }
+      else{
+        this.clickedUpvote = false;
+        this.clickedDownvote = false;
+        this.voted = false;
+      }
+        
+    }
   },
-  created(){
-    console.log(this.card)
+  mounted(){
+    this.storageNegatives = this.storageVote(false);
+    this.storagePositives = this.storageVote(true);
   }
 }
 </script>
 
 <style scoped>
+h1{
+  margin: 0;
+}
 .card-component-list{
   position: relative;
   min-height: 200px;
-  height: 30vh;
   margin-bottom: 25px;
 }
 .current-status{
   position: absolute;
   left: 0;
   top: 0;
-  width: 40px;
-  height: 40px;
-  display: flex;
 }
 .time-ago{
   position: absolute;
@@ -115,11 +181,6 @@ export default {
 .down{
   background-color: rgba(var(--color-yellow-negative), .8);
 }
-.current-status img{
-  display:block;
-  margin:auto;
-  scale: 1.4;
-}
 .card-content{
   display: flex;
   flex-direction: column;
@@ -130,8 +191,27 @@ export default {
 .middle-desc{
   margin-left:20%;
 }
-.bottom-votes{
-  min-height: ;
+.buttons-div{
+  align-items: center;
+}
+.btn{
+  margin: 0 5px;
+}
+.btn-vote{
+  width: max-content;
+  transition: ease-in-out 0.2s all;
+  border: 2px solid var(--color-white);
+  color: var(--color-white);
+  height: 48px;
+  padding: 0 20px;
+  font-size: 20px;
+  font-weight: 300;
+}
+.btn-inactive{
+  background-color: var(--color-dark-gray); 
+}
+.btn-active{
+  background-color: var(--color-darker-gray); 
 }
 .bottom-votes h1{
   margin: 10px 0;
