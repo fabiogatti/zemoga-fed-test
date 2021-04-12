@@ -97,9 +97,9 @@
                 <option value="1">Grid</option>
               </select>
             </div>
-            <div class="cards-list">
-              <div v-for="card in cards" :key="card.name">
-                <card :card='card' :isGrid='isGrid'></card>
+            <div class="cards-list" :class="[ !isGrid ? 'grid-layout' : '' ]">
+              <div v-for="card in cards" :key="card.name" class="card-item">
+                <card :card='card' :isGrid='!isGrid'></card>
               </div>
             </div>
             
@@ -653,6 +653,11 @@ main h2 {
 }
 
 /* New implementation of code */
+main{
+    display: flex;
+    flex-direction: column;
+}
+
 .main-header{
   display: flex;
   flex-direction: row;
@@ -679,6 +684,17 @@ main h2 {
 
 /* End of new implementation */
 
+@media all and (max-width: 768px){
+    .grid-layout{
+        display: flex;
+        overflow-x: auto;
+        flex-direction: row;
+        overflow-y: hidden;
+    }
+    .card-item{
+        margin-right: 15px;
+    }
+}
 
 @media all and (min-width: 500px) {
     .banner-top .banner__left {
@@ -785,6 +801,17 @@ main h2 {
     .footer__social > ul {
         margin-top: 3px;
     } 
+
+    /* New code */
+    .grid-layout{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 25px;
+        width: min-content;
+        align-self: center;
+        justify-content: center;
+    }
+    /* End of new code */
 }
 
 @media all and (min-width: 1100px) {
@@ -960,5 +987,13 @@ main h2 {
     hr[role="separator"] {
         margin: 2rem 0;
     }
+
+    /* New code */
+    .grid-layout{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 25px;
+    }
+    /* End of new code */
 }
 </style>

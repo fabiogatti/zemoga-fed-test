@@ -1,6 +1,7 @@
 <template>
-  <div class="card-component-list">
-    <div class="background flex-row">
+<div>
+  <div class="card-component-list" v-show="!isGrid">
+    <div class="background">
       <div class="photo-div">
         <img :src="getImgUrl" :alt="card.name">
       </div>
@@ -40,6 +41,13 @@
       </div>
     </div>
   </div>
+  <div class="card-component-grid" v-show="isGrid">
+    <div class="photo-div-g">
+      <img :src="getImgUrl" :alt="card.name">
+    </div>
+    <vote class="current-status-g" :isLike='card.likes >= card.dislikes ? true : false' disabled></vote>
+  </div>
+</div>
 </template>
 
 <script>
@@ -51,7 +59,7 @@ export default {
   components: { Vote },
   props: {
     card: CardClass,
-    isGrid: Boolean
+    isGrid: { type:Boolean , default:true }
   },
   data() {
     return {
@@ -64,10 +72,12 @@ export default {
   },
   computed: {
     yearAgoText(){
-      const lastDate = new Date(this.card.lastUpdated);
-      const now = new Date();
-      var diffTime = Math.abs(now - lastDate);
-      var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      let lastDate = new Date(this.card.lastUpdated);
+      if(isNaN(lastDate.getTime()))
+        return 'in '
+      let now = new Date();
+      let diffTime = Math.abs(now - lastDate);
+      let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       if(diffDays==0){
         return 'less than a day ago in ';
       }
@@ -172,6 +182,7 @@ export default {
 </script>
 
 <style scoped>
+
 h1{
   margin: 0;
   margin-top: 10px;
@@ -274,5 +285,38 @@ h1{
 .bottom-votes img{
   scale: 1.4;
   padding: 0px 10px;
+}
+
+/* GRID STYLE */
+.card-component-grid{
+  height: 350px;
+  width: 360px;
+  position: relative;
+}
+.photo-div-g{
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  position: absolute;
+}
+.photo-div-g img{
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.current-status-g{
+  position: absolute;
+}
+
+
+
+
+
+@media all and (max-width: 500px) {
+  .card-component-grid{
+    height: 300px;
+    width: 310px;
+    position: relative;
+  }
 }
 </style>
