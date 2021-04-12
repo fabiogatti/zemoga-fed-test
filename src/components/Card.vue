@@ -428,8 +428,6 @@ h1{
 }
 
 
-
-
 @media all and (max-width: 500px) {
   .card-component-grid{
     height: 300px;

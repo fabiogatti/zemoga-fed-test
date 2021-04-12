@@ -89,7 +89,6 @@
         </aside>
         <main role="main">
             <!-- Start: Implementation -->
-            👉 Your code goes here 👈
             <div class="main-header">
               <h1>Previous Rulings</h1>
               <select id="gridType" v-show="displaySelect" v-model="selected" @change="selectChanged()">
@@ -102,8 +101,6 @@
                 <card :card='card' :isGrid='isGrid'></card>
               </div>
             </div>
-            
-            
             <!-- End: Implementation -->
         </main>
         <aside class="banner banner-bottom" role="doc-tip" aria-label="Submit a name">
@@ -714,7 +711,7 @@ main{
   flex-direction: column;
 }
 
-/* End of new implementation */
+/* End of new code */
 
 @media all and (max-width: 768px){
     .grid-layout{
@@ -834,7 +831,7 @@ main{
         margin-top: 3px;
     } 
 
-    /* New code */
+    /* New implementation of code */
     .grid-layout{
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -1020,7 +1017,7 @@ main{
         margin: 2rem 0;
     }
 
-    /* New code */
+    /* New implementation of code */
     .grid-layout{
         display: grid;
         grid-template-columns: repeat(3, 1fr);
