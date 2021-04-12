@@ -232,6 +232,7 @@ export default {
     --color-white: rgba(255, 255, 255, 1);
     --color-gradient-light-gray: #888888;
     --color-gradient-dark-gray: #666666;
+    --color-black: rgba(0, 0, 0, 1);
 }
 
 html, body {

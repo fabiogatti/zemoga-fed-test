@@ -46,7 +46,7 @@ export default {
   opacity: 1;
 }
 .like:hover[disabled]{
-  opacity: 0.75;
+  opacity: 1;
 }
 .dislike{
   background-color: rgba(var(--color-yellow-negative), 1);
@@ -59,7 +59,7 @@ export default {
   opacity: 1;
 }
 .dislike:hover[disabled]{
-  opacity: 0.75;
+  opacity: 1;
 }
 .active{
   border: 2px solid var(--color-white);

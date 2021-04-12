@@ -13,7 +13,7 @@
     </div>
     <div class="card-content">
       <div class="top-name">
-        <h1>{{ card.name }}</h1>
+        <h1>{{ trimmedName }}</h1>
       </div>
       <div class="middle-desc flex-row">
         <div class="description">
@@ -46,6 +46,37 @@
       <img :src="getImgUrl" :alt="card.name">
     </div>
     <vote class="current-status-g" :isLike='card.likes >= card.dislikes ? true : false' disabled></vote>
+    <div class="content-g flex-column">
+      <div class="margin-grid">
+        <h1>{{ trimmedName }}</h1>
+      </div>
+      <div class="margin-grid desc-g">
+        <p>{{ trimmedDescGrid }}</p>
+      </div>
+      <div class="margin-grid-right time-ago-g">
+        <p v-show="!voted">{{ yearAgoText + card.category }}</p>
+        <p v-show="voted">Thank you for your vote!</p>
+      </div>
+      <div class="margin-grid-right buttons-div-g flex-row">
+        <vote class="btn" :isLike='true' :isButton="true" :isActive="clickedUpvote" @clicked='clickedVote' v-show="!voted"></vote>
+        <vote class="btn" :isLike='false' :isButton="true" :isActive="clickedDownvote" @clicked='clickedVote' v-show="!voted"></vote>
+        <button class="btn btn-vote" @click="submitVote()" :class="[ clickedUpvote || clickedDownvote ? 'btn-active-g' : 'btn-inactive']">{{ voteBtnText }}</button>
+      </div>
+      <div class="bottom-votes-g flex-row">
+        <div class="up" :style="{ width : likesPercentage+'%' }"  :key="voted+totalPositiveVotes+'1'">
+          <div class="flex-row">
+            <img src="@/assets/img/thumbs-up.svg" alt="thumbs up"/>
+            <p :key="voted+totalPositiveVotes">{{ likesPercentage }}%</p>
+          </div>
+        </div>
+        <div class="down justify-flex-end" :style="{ width : dislikesPercentage+'%' }" :key="voted+totalNegativeVotes+'1'">
+          <div class="flex-row">
+            <p :key="voted+totalNegativeVotes">{{ dislikesPercentage }}%</p>
+            <img src="@/assets/img/thumbs-down.svg" alt="thumbs down"/>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -67,7 +98,8 @@ export default {
       clickedDownvote: false,
       voted: false,
       storageNegatives: Number,
-      storagePositives: Number
+      storagePositives: Number,
+      innerWidth: Number
     }
   },
   computed: {
@@ -109,10 +141,10 @@ export default {
       return this.totalPositiveVotes + this.totalNegativeVotes;
     },
     likesPercentage(){
-      return Math.ceil(this.totalPositiveVotes/this.totalVotes*100);
+      return (Math.ceil(this.totalPositiveVotes/this.totalVotes*100*10))/10;
     },
     dislikesPercentage(){
-      return Math.floor(this.totalNegativeVotes/this.totalVotes*100);
+      return (Math.floor(this.totalNegativeVotes/this.totalVotes*100*10))/10;
     },
     voteBtnText(){
       if(this.voted){
@@ -125,6 +157,23 @@ export default {
       if(this.card.description.length < 150)
         return this.card.description
       return this.card.description.substring(0,149) + '...'
+    },
+    trimmedDescGrid(){
+      if(this.card.description.length < 100)
+        return this.card.description
+      return this.card.description.substring(0,99) + '...'
+    },
+    trimmedName(){
+      if(this.card.name.length <= 25 || (this.innerWidth>500 && this.card.name.length < 40))
+        return this.card.name;
+      else if(this.innerWidth>500 && this.card.name.length > 40){
+        let substr = this.card.name.substring(0,39)
+        return substr.substring(0,substr.lastIndexOf(' ')) + '...'
+      }
+      else{
+        let substr = this.card.name.substring(0,24)
+        return substr.substring(0,substr.lastIndexOf(' ')) + '...'
+      }
     },
     getImgUrl() {
       var images = require.context('../assets/img', false, /\.jpg$/);
@@ -171,13 +220,22 @@ export default {
         this.clickedDownvote = false;
         this.voted = false;
       }
-        
+    },
+    setWidthVariable(){
+      this.innerWidth = window.innerWidth;
     }
   },
   mounted(){
     this.storageNegatives = this.storageVote(false);
     this.storagePositives = this.storageVote(true);
-  }
+  },
+  created(){
+    window.addEventListener("resize", this.setWidthVariable);
+    this.setWidthVariable();
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.setWidthVariable);
+  },
 }
 </script>
 
@@ -241,7 +299,8 @@ h1{
   margin-left:20%;
 }
 .description{
-  word-break: break-all;
+  text-align: justify;
+  padding-right: 50px;
 }
 .buttons-div{
   align-items: center;
@@ -272,25 +331,30 @@ h1{
   margin: 10px 0;
   font-weight: normal;
   color: var(--color-white);
-  font-size: 30px;
-}
-.flex-row{
-  display: flex;
-  flex-direction: row;
-}
-.justify-flex-end{
-  display: flex;
-  justify-content: flex-end;
+  font-size: 26px;
 }
 .bottom-votes img{
   scale: 1.4;
   padding: 0px 10px;
 }
+.flex-row{
+  display: flex;
+  flex-direction: row;
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+}
+.justify-flex-end{
+  display: flex;
+  justify-content: flex-end;
+}
+
 
 /* GRID STYLE */
 .card-component-grid{
-  height: 350px;
-  width: 360px;
+  height: 340px;
+  width: 350px;
   position: relative;
 }
 .photo-div-g{
@@ -298,16 +362,70 @@ h1{
   height: 100%;
   z-index: 0;
   position: absolute;
+  background-color: rgba(1,1,1,1);
 }
 .photo-div-g img{
   height: 100%;
   width: 100%;
   object-fit: cover;
+  mask-image: linear-gradient(to bottom, rgba(1,1,1,1), rgba(0,0,0,0));
 }
 .current-status-g{
   position: absolute;
+  top: calc(50% - 55px);
 }
-
+.content-g{
+  height: 100%;
+  justify-content: flex-end;
+}
+.desc-g{
+  font-size: 14px;
+  text-align: justify;
+}
+.desc-g p{
+  margin-top: 7px;
+  margin-bottom: 10px;
+}
+.content-g h1{
+  font-size: 30px;
+}
+.margin-grid{
+  margin: 0 50px;
+}
+.margin-grid-right{
+  margin-right: 40px;
+}
+.time-ago-g{
+  text-align: end;
+  font-size: 13px;
+}
+.time-ago-g p{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.btn-active-g{
+  background-color: var(--color-black);
+}
+.buttons-div-g{
+  align-items: center;
+  min-width: 250px;
+  justify-content: flex-end;
+  margin-right: 0px;
+  scale: 0.75;
+}
+.bottom-votes-g{
+  margin-top: 5px;
+}
+.bottom-votes-g p{
+  margin: 5px 0;
+  font-weight: normal;
+  color: var(--color-white);
+  font-size: 20px;
+}
+.bottom-votes-g img{
+  scale: 1;
+  padding: 0px 10px;
+}
 
 
 
