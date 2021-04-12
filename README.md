@@ -1,6 +1,6 @@
 # zemoga-fed-test
-Author: Fabio Alessandro Gatti
-Started: Saturday afternoon
+Author: Fabio Alessandro Gatti  
+Started: Saturday afternoon  
 Ended: Monday morning (around 1 am)
 
 ## How to setup this project?
