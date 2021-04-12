@@ -92,14 +92,14 @@
             👉 Your code goes here 👈
             <div class="main-header">
               <h1>Previous Rulings</h1>
-              <select id="gridType">
-                <option value="0">List</option>
-                <option value="1">Grid</option>
+              <select id="gridType" v-show="displaySelect" v-model="selected" @change="selectChanged()">
+                <option value="List" selected>List</option>
+                <option value="Grid">Grid</option>
               </select>
             </div>
-            <div class="cards-list" :class="[ !isGrid ? 'grid-layout' : '' ]">
+            <div class="cards-list" :class="[ isGrid ? 'grid-layout' : '' ]">
               <div v-for="card in cards" :key="card.name" class="card-item">
-                <card :card='card' :isGrid='!isGrid'></card>
+                <card :card='card' :isGrid='isGrid'></card>
               </div>
             </div>
             
@@ -167,7 +167,9 @@ export default {
   name: 'App',
   data() {
     return {
-      isGrid: false
+      isGrid: false,
+      displaySelect: true,
+      selected: ''
     }
   },
   computed:{
@@ -180,8 +182,37 @@ export default {
     }
   },
   methods:{
-
-  }
+      detectResize(){
+          if(window.innerWidth <= 768){
+            this.displaySelect = false;
+            this.isGrid = true;
+          }
+          else{
+            this.displaySelect = true;
+            if(this.isGrid){
+                this.isGrid = true;
+                this.selected = 'Grid';
+            }
+            else{
+                this.isGrid = false;
+                this.selected = 'List';
+            }
+          }
+      },
+      selectChanged(){
+          if(this.selected == 'List')
+            this.isGrid = false;
+          else
+            this.isGrid = true;
+      }
+  },
+  created(){
+    window.addEventListener("resize", this.detectResize);
+    this.detectResize();
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.detectResize);
+  },
 }
 </script>
 
